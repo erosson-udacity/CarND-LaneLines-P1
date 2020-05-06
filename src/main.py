@@ -1,4 +1,4 @@
-#importing some useful packages
+# importing some useful packages
 # type:ignore
 import matplotlib.pyplot as plt
 # type:ignore
@@ -12,16 +12,17 @@ import os
 import shutil
 from moviepy.editor import VideoFileClip
 
-
 #################################
 
 
-#reading in an image
+# reading in an image
 image = mpimg.imread('test_images/solidWhiteRight.jpg')
 
-#printing out some stats and plotting
-print('This image is:', type(image), 'with dimensions:', image.shape)
-plt.imshow(image)  # if you wanted to show a single color channel image called 'gray', for example, call as plt.imshow(gray, cmap='gray')
+
+# printing out some stats and plotting
+# print('This image is:', type(image), 'with dimensions:', image.shape)
+# plt.imshow(
+#    image)  # if you wanted to show a single color channel image called 'gray', for example, call as plt.imshow(gray, cmap='gray')
 
 
 #################################
@@ -129,18 +130,65 @@ def weighted_img(img, initial_img, α=0.8, β=1., γ=0.):
 #################################
 
 
-def process(img: any) -> any:
-    # TODO the image processing
-    return img
+def process(img0: any) -> any:
+    img = np.copy(img0)
+    img = grayscale(img)
+    img = canny(img, 50, 150)
+    img = gaussian_blur(img, 3)
+
+    # print(img.shape)
+    (ym, xm) = img.shape
+    (x0, x1) = (0, xm)
+    (y0, y1) = (ym, ym // 2)
+    vertices = [(x0, y0), (x0, y1), (x1, y1), (x1, y0)]
+    # print(vertices)
+    img = region_of_interest(img, np.array([vertices]))
+
+    # def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
+    hough_args = dict(
+        # My quiz answers; section 4-16. This detects *other* lanes, but not ours!
+        # rho=1,
+        # theta=math.pi / 360,
+        # threshold=10,
+        # min_line_len=200,
+        # max_line_gap=3,
+
+        # The official quiz answers. Detects lots of nonsense lines!
+        #rho=2,
+        #theta=math.pi / 180,
+        #threshold=15,
+        #min_line_len=40,
+        #max_line_gap=20,
+
+        # Finally, parameters tweaked for this project.
+        rho=2,
+        theta=math.pi / 180,
+        threshold=80,
+        min_line_len=ym // 4,
+        max_line_gap=ym // 8,
+    )
+    print(hough_args)
+    lines = hough_lines(np.copy(img), **hough_args)
+    # img = hough_lines(img, **hough_args)
+
+    canny_img = weighted_img(lines, cv2.cvtColor(img, cv2.COLOR_GRAY2RGB))
+    img = weighted_img(lines, np.copy(img0))
+
+    return {'': img, '_canny': canny_img}
 
 
 in_dir: str = "test_images"
 out_dir: str = "test_images_output"
 
-shutil.rmtree(out_dir)
-os.mkdir(out_dir)
+# shutil.rmtree(out_dir)
+os.makedirs(out_dir, exist_ok=True)
+for file in os.listdir(out_dir):
+    os.remove(os.path.join(out_dir, file))
 for file in os.listdir(in_dir):
     in_path = os.path.join(in_dir, file)
-    out_path = os.path.join(out_dir, file)
-    image = process(mpimg.imread(in_path))
-    mpimg.imsave(out_path, image)
+    images = process(mpimg.imread(in_path))
+    for (suffix, image) in images.items():
+        (basename, ext) = file.split('.')
+        out_path = os.path.join(out_dir, ''.join([basename, suffix, '.', ext]))
+        print(out_path)
+        mpimg.imsave(out_path, image)

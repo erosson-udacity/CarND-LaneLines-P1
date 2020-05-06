@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 mypy = "*"
+ipykernel = "*"
 
 [packages]
 matplotlib = "*"
@@ -12,6 +13,7 @@ numpy = "*"
 opencv-python = "*"
 pillow = "*"
 moviepy = "*"
+rerun = "*"
 
 [requires]
 python_version = "3.7"
