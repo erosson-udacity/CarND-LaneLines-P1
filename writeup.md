@@ -20,13 +20,9 @@ My pipeline consists of 6 steps, all called from the `process()` function.
 
 ---
 
-To find good parameters for the above steps, I used [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/examples/Using%20Interact.html) to easily create a simple UI for parameter tweaking. This UI isn't available in Udacity's official Python environment, but it was useful for me during development. To see these widgets, `pip install ipywidgets`, or use [`pipenv` with my Pipfile](https://pipenv.readthedocs.io/) instead of Udacity's official environment.
+To find good parameters for the above steps, I used [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/examples/Using%20Interact.html) to easily create a simple UI for parameter tweaking. I'm not sure if this UI is available in Udacity's official Python environment, but it was useful for me during development. (The UI is ignored if unavailable; it will not error.)
 
-<details open><summary>IPyWidgets video</summary>
- 
-![inline video](./writeup/P1-ipywidgets.gif)
-
-</details>
+<details open><summary>IPyWidgets video</summary><img src="./writeup/P1-ipywidgets.gif"></details>
 
 ---
 
